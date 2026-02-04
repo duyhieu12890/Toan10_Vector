@@ -9,6 +9,8 @@
     <div id="status">Đang xác thực link...</div>
 
     <script>
+        
+        
         // 1. Cấu hình Firebase của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyB0CNdoLDZU9pF5CPHuVGMrWnAdzQSZcgo",
@@ -38,7 +40,7 @@
                 if (data.isBlocked === true) { // Lưu ý logic
                     throw "Quyền truy cập đã bị Admin thu hồi (Link bị khóa)";
                 }
-                
+
                 if (!data) {
                     throw "Link không tồn tại";
                 }
