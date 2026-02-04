@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đang kiểm tra quyền truy cập...</title>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div id="status">Đang xác thực link...</div>
+
+    <script>
+        // 1. Cấu hình Firebase của bạn
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0CNdoLDZU9pF5CPHuVGMrWnAdzQSZcgo",
+            authDomain: "thuan10vectors.firebaseapp.com",
+            databaseURL: "https://thuan10vectors-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "thuan10vectors",
+            storageBucket: "thuan10vectors.firebasestorage.app",
+            messagingSenderId: "965608552389",
+            appId: "1:965608552389:web:2064690144d13ff9b1bdac"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 2. Lấy ID từ URL (?id=jiyh76y7i)
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkId = urlParams.get('id');
+
+        if (!linkId) {
+            document.body.innerHTML = "<h1>Lỗi: Không tìm thấy mã truy cập</h1>";
+        } else {
+            // 3. Truy vấn Database
+            db.ref('links/' + linkId).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                const now = Date.now();
+
+                if (data.isBlocked === true) { // Lưu ý logic
+                    throw "Quyền truy cập đã bị Admin thu hồi (Link bị khóa)";
+                }
+                
+                if (!data) {
+                    throw "Link không tồn tại";
+                }
+                if (data.isBlocked) {
+                    throw "Link này đã bị khóa";
+                }
+                if (now > data.expireAt) {
+                    throw "Link này đã hết hạn";
+                }
+
+                // 4. Nếu hợp lệ, lấy nội dung file HTML tương ứng
+                // Giả sử bạn để file1.html và file2.html cùng thư mục
+                fetch(data.targetFile)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.open();
+                        document.write(html); // "Ghi đè" nội dung file game vào trang hiện tại
+                        document.close();
+                    });
+
+            }).catch((err) => {
+                document.body.innerHTML = `<h1>Truy cập bị từ chối</h1><p>${err}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

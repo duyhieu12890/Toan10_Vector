@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Link Game - Admin Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --danger: #ef4444;
+            --success: #10b981;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+
+        /* Form Controls */
+        .form-group { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .input-wrap { flex: 1; min-width: 200px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        input:focus, select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #4338ca; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-copy { background: #3b82f6; color: white; padding: 5px 10px; font-size: 0.8rem; }
+        .btn-edit { background: #f59e0b; color: white; padding: 5px 10px; font-size: 0.8rem; }
+        .btn-del { background: var(--danger); color: white; padding: 5px 10px; font-size: 0.8rem; }
+
+        /* Table Styles */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f9fafb; font-weight: 700; color: #4b5563; }
+        tr:hover { background-color: #f9fafb; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-blocked { background: #f3f4f6; color: #6b7280; text-decoration: line-through; }
+
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+        .modal-actions { margin-top: 20px; text-align: right; }
+
+        /* Utilities */
+        .text-sm { font-size: 0.85rem; color: #6b7280; }
+        .link-text { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>🚀 Tạo Link Truy Cập Mới</h2>
+        <div class="form-group">
+            <div class="input-wrap">
+                <label>Phiên bản Game</label>
+                <select id="fileSelect">
+                    <option value="Pages/TroChoiVecto_Lop10_Full_20h42.html">Bản 20H42 : HẠM ĐỘI VỀ ĐÍCH</option>
+                    <option value="Pages/TroChoiVecto_Full_20h39.html">Bản 20H39 : TRUY TÌM KHO BÁU</option>
+                </select>
+            </div>
+            <div class="input-wrap">
+                <label>Thời gian tồn tại (Phút)</label>
+                <input type="number" id="minutes" placeholder="VD: 60" min="1">
+            </div>
+            <div class="input-wrap">
+                <label>Ghi chú (Tên khách, Lớp...)</label>
+                <input type="text" id="note" placeholder="VD: Lớp 12A1 Kiểm tra">
+            </div>
+            <button onclick="createLink()" class="btn-primary">Tạo Link Ngay</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Danh Sách Link Đã Tạo</h2>
+        <div class="table-responsive">
+            <table id="linkTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Ghi chú</th>
+                        <th>Link ID</th>
+                        <th>Phiên bản</th>
+                        <th>Trạng thái</th>
+                        <th>Hết hạn lúc</th>
+                        <th>Cho phép</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="8" style="text-align:center">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>✏️ Chỉnh Sửa Link</h3>
+        <input type="hidden" id="editId">
+        
+        <label>Ghi chú:</label>
+        <input type="text" id="editNote" style="margin-bottom: 10px;">
+        
+        <label>Cập nhật thời hạn mới (Chọn mốc thời gian):</label>
+        <input type="datetime-local" id="editExpire">
+        <p class="text-sm">Hoặc để trống nếu không muốn đổi thời gian.</p>
+
+        <div class="modal-actions">
+            <button onclick="saveEdit()" class="btn-primary">Lưu Thay Đổi</button>
+            <button onclick="closeModal()" class="btn-danger" style="background:#9ca3af">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. CẤU HÌNH FIREBASE (THAY THÔNG TIN CỦA BẠN VÀO ĐÂY) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0CNdoLDZU9pF5CPHuVGMrWnAdzQSZcgo",
+        authDomain: "thuan10vectors.firebaseapp.com",
+        databaseURL: "https://thuan10vectors-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "thuan10vectors",
+        storageBucket: "thuan10vectors.firebasestorage.app",
+        messagingSenderId: "965608552389",
+        appId: "1:965608552389:web:2064690144d13ff9b1bdac"
+    };
+
+    // Khởi tạo Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // --- 2. LOGIC TẠO LINK ---
+    function createLink() {
+        const file = document.getElementById('fileSelect').value;
+        const mins = document.getElementById('minutes').value;
+        const note = document.getElementById('note').value;
+
+        // Validate
+        if (!mins || mins <= 0) {
+            alert("❌ Vui lòng nhập số phút hợp lệ (> 0)");
+            return;
+        }
+        if (!note.trim()) {
+            if(!confirm("⚠️ Bạn chưa nhập Ghi chú, sẽ khó phan biệt link cho đối tượng nào. Có muốn tiếp tục không?")) return;
+        }
+
+        const id = Math.random().toString(36).substring(2, 10);
+        const now = Date.now();
+        const expireAt = now + (mins * 60 * 1000);
+
+        const linkData = {
+            id: id,
+            targetFile: file,
+            expireAt: expireAt,
+            createdAt: now,
+            isBlocked: false, // Mặc định là cho phép
+            note: note || "Không có ghi chú"
+        };
+
+        db.ref('links/' + id).set(linkData)
+            .then(() => {
+                alert("✅ Tạo link thành công!");
+                // Reset form
+                document.getElementById('minutes').value = '';
+                document.getElementById('note').value = '';
+            })
+            .catch(err => alert("Lỗi: " + err.message));
+    }
+
+    // --- 3. LOGIC HIỂN THỊ DANH SÁCH (REALTIME) ---
+    db.ref('links').on('value', (snapshot) => {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = ""; // Xóa cũ
+        const data = snapshot.val();
+
+        if (!data) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">Chưa có link nào được tạo.</td></tr>';
+            return;
+        }
+
+        // Chuyển object thành array và sắp xếp (Mới nhất lên đầu)
+        const linksArr = Object.values(data).sort((a, b) => b.createdAt - a.createdAt);
+
+        linksArr.forEach((item, index) => {
+            const now = Date.now();
+            const isExpired = now > item.expireAt;
+            let statusBadge = "";
+
+            if (item.isBlocked) {
+                statusBadge = '<span class="badge badge-blocked">Đang chặn</span>';
+            } else if (isExpired) {
+                statusBadge = '<span class="badge badge-expired">Hết hạn</span>';
+            } else {
+                statusBadge = '<span class="badge badge-active">Hoạt động</span>';
+            }
+
+            // Tạo URL đầy đủ (Giả sử index.html cùng thư mục)
+            const fullLink = window.location.href.replace('manager.html', 'index.html') + "?id=" + item.id;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${escapeHtml(item.note)}</strong></td>
+                <td class="text-sm">${item.id}</td>
+                <td class="text-sm">${item.targetFile}</td>
+                <td>${statusBadge}</td>
+                <td class="text-sm">${formatDate(item.expireAt)}</td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" ${!item.isBlocked ? "checked" : ""} 
+                               onchange="toggleAccess('${item.id}', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <button class="btn-copy" onclick="copyLink('${fullLink}')" title="Copy Link">📋</button>
+                    <button class="btn-edit" onclick="openEditModal('${item.id}', '${escapeHtml(item.note)}', ${item.expireAt})" title="Sửa">✎</button>
+                    <button class="btn-del" onclick="deleteLink('${item.id}')" title="Xóa">🗑</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+
+    // --- 4. CÁC CHỨC NĂNG HÀNH ĐỘNG ---
+
+    // Chặn / Cho phép (Switch)
+    function toggleAccess(id, isAllowed) {
+        // Nếu isAllowed = true (checked) -> isBlocked = false
+        db.ref('links/' + id).update({ isBlocked: !isAllowed });
+    }
+
+    // Xóa link
+    function deleteLink(id) {
+        if(confirm("Bạn có chắc muốn xóa vĩnh viễn link này?")) {
+            db.ref('links/' + id).remove();
+        }
+    }
+
+    // Copy Link
+    function copyLink(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Đã copy link vào bộ nhớ tạm!");
+        });
+    }
+
+    // --- 5. LOGIC MODAL CHỈNH SỬA ---
+    const modal = document.getElementById("editModal");
+
+    function openEditModal(id, currentNote, currentExpire) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editNote').value = currentNote;
+        
+        // Convert timestamp to datetime-local format (YYYY-MM-DDTHH:MM)
+        const date = new Date(currentExpire);
+        const str = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        document.getElementById('editExpire').value = str;
+
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    function saveEdit() {
+        const id = document.getElementById('editId').value;
+        const newNote = document.getElementById('editNote').value;
+        const newTimeStr = document.getElementById('editExpire').value;
+
+        const updateData = { note: newNote };
+        
+        if (newTimeStr) {
+            updateData.expireAt = new Date(newTimeStr).getTime();
+        }
+
+        db.ref('links/' + id).update(updateData).then(() => {
+            closeModal();
+            // alert("Đã cập nhật!"); // Không cần alert vì bảng tự reload
+        });
+    }
+
+    // Đóng modal khi click ra ngoài
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // --- UTILS ---
+    function formatDate(timestamp) {
+        return new Date(timestamp).toLocaleString('vi-VN');
+    }
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+
+</body>
+</html>
