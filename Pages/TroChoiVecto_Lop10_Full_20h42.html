@@ -2538,7 +2538,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         document.getElementById('live-indicator').classList.add('hidden');
                         document.getElementById('data-log-body').innerHTML = '<tr><td colspan="5" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i> Đang đồng bộ dữ liệu Cloud...</td></tr>';
                         
-                        const q = collection(db, 'artifacts', appId, 'public', '20h-42', 'data', 'game_results');
+                        const q = collection(db, 'artifacts', appId, 'public', 'data', 'game_results');
                         unsubscribe = onSnapshot(q, (snapshot) => {
                             let cloudData = [];
                             snapshot.forEach((doc) => {
