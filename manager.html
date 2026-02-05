@@ -76,6 +76,22 @@
 
 <div class="container">
     <div class="card">
+        <h2>👨‍🏫 Truy cập nhanh Trang Giáo viên</h2>
+        <div class="form-group">
+            <div class="input-wrap">
+                <label>Chọn phiên bản cần xem kết quả</label>
+                <select id="teacherFileSelect">
+                    <option value="Pages/TroChoiVecto_Lop10_Full_20h42_teacher.html">Bản 20H42 : HẠM ĐỘI VỀ ĐÍCH</option>
+                    <option value="Pages/TroChoiVecto_Full_20h39_teacher.html">Bản 20H39 : TRUY TÌM KHO BÁU</option>
+                </select>
+            </div>
+            <div class="input-wrap" style="flex: 0; min-width: 150px;">
+                <button onclick="goToTeacherPage()" class="btn-primary" style="background: #059669; width: 100%;">Vào Trang</button>
+            </div>
+        </div>
+        <p class="text-sm" style="margin-top: 10px;">ℹ️ Hệ thống sẽ yêu cầu mật khẩu Admin để truy cập vào các tệp này.</p>
+    </div>
+    <div class="card">
         <h2>🚀 Tạo Link Truy Cập Mới</h2>
         <div class="form-group">
             <div class="input-wrap">
@@ -332,6 +348,23 @@
             .replace(/'/g, "&#039;");
     }
 </script>
-
+<script>
+    function goToTeacherPage() {
+        const selectedFile = document.getElementById('teacherFileSelect').value;
+        
+        // Bạn hãy đặt mật khẩu Admin tại đây
+        const adminPassword = "ADMIN_PASSWORD_CUA_BAN"; 
+        
+        const input = prompt("Nhập mật khẩu quản trị viên để vào trang giáo viên:");
+        
+        if (input === adminPassword) {
+            // Chuyển hướng trực tiếp đến file trong thư mục Pages
+            // Vì manager.html ở ngoài, nên gọi thẳng Pages/...
+            window.location.href = selectedFile;
+        } else if (input !== null) {
+            alert("❌ Mật khẩu sai! Truy cập bị từ chối.");
+        }
+    }
+</script>
 </body>
 </html>
