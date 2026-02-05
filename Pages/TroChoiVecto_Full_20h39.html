@@ -1914,7 +1914,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id-20h-39';
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
                 const initAuth = async () => {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -1948,7 +1948,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         document.getElementById('live-indicator').classList.add('hidden');
                         document.getElementById('data-log-body').innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i> Đang đồng bộ dữ liệu Cloud...</td></tr>';
                         
-                        const q = collection(db, 'artifacts', appId, 'public', 'data', 'game_results');
+                        const q = collection(db, 'artifacts', appId, 'public', '20h-39', 'data', 'game_results');
                         unsubscribe = onSnapshot(q, (snapshot) => {
                             let cloudData = [];
                             snapshot.forEach((doc) => {
