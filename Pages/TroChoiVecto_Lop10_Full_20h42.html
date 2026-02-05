@@ -2491,9 +2491,9 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
     <!-- MODULE CLOUD/FIREBASE (ĐƯỢC TÁCH RIÊNG ĐỂ KHÔNG CHẶN GAME NẾU LỖI) -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js';
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js';
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js';
 
         let db, auth, appId;
         let unsubscribe = null;
@@ -2504,7 +2504,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id-20h-42';
 
                 const initAuth = async () => {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
